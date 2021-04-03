@@ -6,16 +6,12 @@ const neasSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
-  fullName: {
+  full_name: {
     type: String,
     unique: true,
     required: true,
   },
   a: {
-    type: Number,
-    required: true,
-  },
-  b: {
     type: Number,
     required: true,
   },

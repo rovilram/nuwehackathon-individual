@@ -1,5 +1,6 @@
 const { nanoid } = require('nanoid');
 const md5 = require('md5');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const isValidPassword = (password) => {
@@ -38,6 +39,7 @@ const isValidPassword = (password) => {
 
 exports.addUser = async (req, res) => {
   const idUser = nanoid();
+  const secretKey = nanoid();
   const { userName, password } = req.body;
   if (!userName || !password) {
     res.status(400).send({
@@ -46,7 +48,6 @@ exports.addUser = async (req, res) => {
       message: 'ERROR, userName y password no pueden estar vacios',
     });
   }
-  console.log(userName, password);
   const isValidPass = isValidPassword(password);
   if (!isValidPass.OK) {
     res.status(400).send({
@@ -55,7 +56,12 @@ exports.addUser = async (req, res) => {
       message: isValidPass.message,
     });
   }
-  const newUser = new User({ idUser, userName, password: md5(password) });
+  const newUser = new User({
+    idUser,
+    userName,
+    password: md5(password),
+    secretKey,
+  });
   try {
     const result = await newUser.save();
     res.status(200).send({
@@ -248,5 +254,135 @@ exports.deleteUser = async (req, res) => {
       status: 500,
       message: `ERROR, no se ha podido encontrar usuario: ${error}`,
     });
+  }
+};
+
+exports.login = async (req, res) => {
+  const { user } = req.body;
+  const { password } = req.body;
+
+  const response = await User.findOne({ user, password: md5(password) });
+
+  if (response) {
+    const payload = { user };
+    const options = { expiresIn: '10m' };
+    const token = jwt.sign(payload, response.secretKey, options);
+    res.send({
+      OK: 1,
+      message: 'Usuario autorizado',
+      token,
+    });
+  } else {
+    res.status(401).send({
+      OK: 0,
+      error: 401,
+      message: 'usuario/contraseña no válidos',
+    });
+  }
+};
+
+exports.logout = async (req, res) => {
+  const { authorization } = req.headers;
+
+  const token = authorization.split(' ')[1];
+
+  const { user } = jwt.decode(token);
+
+  const response = await User.findOne({ user });
+
+  if (response) {
+    const { secretKey } = response;
+
+    try {
+      jwt.verify(token, secretKey);
+      try {
+        const newSecret = nanoid();
+        await User.updateOne({ user }, { secretKey: newSecret });
+        res.send({
+          OK: 1,
+          message: 'User Disconnected',
+        });
+      } catch (error) {
+        res.status(500).send({
+          OK: 0,
+          error: 500,
+          message: error.message,
+        });
+      }
+    } catch (error) {
+      res.status(401).send({
+        OK: 0,
+        error: 401,
+        message: error.message,
+      });
+    }
+  }
+};
+
+// middleware!!!
+exports.authUser = async (req, res, next) => {
+  const { authorization } = req.headers;
+  if (authorization) {
+    const token = authorization.split(' ')[1];
+
+    const payload = jwt.decode(token);
+
+    if (!payload) {
+      res.status(401).send({
+        OK: 0,
+        status: 401,
+        message: 'Invalid token',
+      });
+    } else {
+      const { user } = payload;
+
+      const response = await User.findOne({ user });
+
+      if (response) {
+        const { secretKey } = response;
+
+        try {
+          jwt.verify(token, secretKey);
+          next();
+        } catch (error) {
+          res.status(401).send({
+            OK: 0,
+            error: 401,
+            message: error.message,
+          });
+        }
+      } else {
+        res.status(401).send({
+          OK: 0,
+          error: 401,
+          message: 'User unknown / invalid Token',
+        });
+      }
+    }
+  } else {
+    res.status(401).send({
+      OK: 0,
+      error: 401,
+      message: 'Token required',
+    });
+  }
+};
+
+exports.importUsers = (users) => {
+  try {
+    User.insertMany(users);
+    users.map(async (user) => {
+      user.idUser = nanoid();
+      user.secretKey = nanoid();
+      const newUser = new User(user);
+      const result = await newUser.save();
+      if (result) {
+        console.log(
+          `Usuario ${result.userName} importado. Contraseña predeterminada Aa#00000`,
+        );
+      }
+    });
+  } catch (error) {
+    console.log(`Error al importar los datos de usuario: ${error}`);
   }
 };

@@ -5,12 +5,12 @@ exports.addNea = async (req, res) => {
   const idNea = nanoid();
 
   // eslint-disable-next-line object-curly-newline
-  const { fullName, a, b, i, om, w, ma } = req.body;
+  const { a, i, om, w, ma } = req.body;
+  const fullName = req.body['full-name'];
   const newNea = new Nea({
     idNea,
-    fullName,
+    'full-name': fullName,
     a,
-    b,
     i,
     om,
     w,
@@ -127,11 +127,12 @@ exports.getNea = async (req, res) => {
 exports.updateNea = async (req, res) => {
   const idNea = req.params.id;
   // eslint-disable-next-line object-curly-newline
-  const { fullName, a, b, i, om, w, ma } = req.body;
+  const { a, b, i, om, w, ma } = req.body;
+  const fullName = req.body['full-name'];
 
   const newNea = {};
 
-  if (fullName) newNea.fullName = fullName;
+  if (fullName) newNea.full_name = fullName;
   if (a) newNea.a = a;
   if (b) newNea.b = b;
   if (i) newNea.i = i;
@@ -193,5 +194,17 @@ exports.deleteNea = async (req, res) => {
       status: 500,
       message: `ERROR, no se ha podido encontrar Nea: ${error}`,
     });
+  }
+};
+
+exports.jsonArr2DB = async (jsonObj) => {
+  const neas = jsonObj.map((nea) => {
+    nea.idNea = nanoid();
+    return nea;
+  });
+  try {
+    await Nea.insertMany(neas);
+  } catch (error) {
+    console.log(`Error en importación CSV: ${error}`);
   }
 };

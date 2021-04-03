@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const userRouter = require('./routes/userRouter');
 const neaRouter = require('./routes/neaRouter');
+const { login, logout, authUser } = require('./controllers/userController');
 
 const server = express();
 
@@ -21,9 +22,15 @@ server.get('/', (req, res) => {
   res.send("Hello World! I'm a API server");
 });
 
+server.use('/user', authUser);
 server.use('/user', userRouter);
 
+server.use('/user', authUser);
 server.use('/nea', neaRouter);
+
+server.post('/login', login);
+
+server.post('/logout', logout);
 
 server.listen(HTTP.port, HTTP.host, () => {
   // eslint-disable-next-line no-console
