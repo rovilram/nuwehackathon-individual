@@ -40,25 +40,50 @@ password.
 **idUser** String, unique, required
 **userName** String, unique, required
 **password** String, required
+**secretKey** String, required --> es la clave con la que generar el token JWT de autenticación.
 
 #### NEA
 
 **idNea** String, unique, required
 **fullName**: String, unique, true
 **a** Number, required
-**b** Number, required
 **i** Number, required
 **om** Number, required
 **w** Number, required
 **ma** Number, required
 
-### ENDPOINTS
+### ENDPOINTS CRUD
 
 #### USER
 
-**/user/** _POST_ CREA nuevo usuario. Recibe objeto _userName_ y _password_ **o** array de objetos de ese tipo.
+**/user/** _POST_ CREA nuevo usuario. Recibe objeto del modelo User.
 **/user/** _GET_ DEVUELVE todos los usuarios.
 
 **/user/:id/** _GET_ DEVUELVE el usuario pasado en _req.params_.
 **/user/:id/** _PATCH_ MODIFICA el usuario pasado en _req.params_. Puede recibir _userName_ y/o _password_
 **/user/:id/** _DELETE_ BORRA el usuario pasado en _req.params_.
+
+#### NEA
+
+**/nea/** _POST_ CREA nuevo Nea. Recibe un objeto del modelo Nea
+**/nea/** _GET_ DEVUELVE todos los Nea.
+
+**/nea/:id/** _GET_ DEVUELVE el Nea con idNea pasado en _req.params_.
+**/nea/:id/** _PATCH_ MODIFICA el Nea con idNEa pasado en _req.params_. Puede recibir _neaName_ y/o _password_
+**/nea/:id/** _DELETE_ BORRA el Nea con idNea pasado en _req.params_.
+
+### ENDPOINTS ADICIONALES
+
+**/user/list** _CREA_ **varios** usuarios. Recibe un array de objetos del modelo User
+**/nea/list** _CREA_ **varios** Neas. Recibe un array de objetos del modelo Nea
+
+### ENDPOINTS AUTORIZACIÓN
+
+**/login** recoje usuario y contraseña y devuelve un **token JWT** a front para autentificarse.
+**/logout** recoje el token y lo desactiva.
+
+### MIDDLEWARE AUTORIZACIÓN
+
+middleware **autUser** que limita el paso a los endpoints del router _/user_ y _/neas_. No se puede hacer nada con ellos sin pasar un _token_ válido.
+
+## INSTALACIÓN
