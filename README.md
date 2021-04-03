@@ -87,3 +87,10 @@ password.
 middleware **autUser** que limita el paso a los endpoints del router _/user_ y _/neas_. No se puede hacer nada con ellos sin pasar un _token_ válido.
 
 ## INSTALACIÓN
+
+1. Clonar repositorio: `git clone https://github.com/rovilram/nuwehackathon-individual`.
+2. reconstituir dependencias npm: `npm install`.
+3. modificar si se quiere los valores predefinidos de servidor web y base de datos, en archivo `.env`, incluido en el repositorio para facilitar instalación.
+4. Ejecutar script para recostituir la base de datos a partir de CSV de NEAS y un json con usuarios predeterminados:. `npm run seeds`.
+5. lanzar con node el fichero js principal: `node main.js`.
+6. probar funcionamiento con postman. Se puede importar en postman el archivo `hackathon.postman_collection.json` incluido.
