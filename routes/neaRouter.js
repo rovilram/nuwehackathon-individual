@@ -9,9 +9,34 @@ const router = express.Router();
   getAllQuestions,
 } = require('../controllers/questionController'); */
 
+const {
+  addNea,
+  getNeas,
+  addNeas,
+  getNea,
+  updateNea,
+  deleteNea,
+} = require('../controllers/neaController');
+
 router
   .route('/')
-  .post(() => {})
-  .get(() => {});
+
+  .post(addNea)
+
+  .get(getNeas);
+
+router
+  .route('/list')
+
+  .post(addNeas);
+
+router
+  .route('/:id')
+
+  .get(getNea)
+
+  .patch(updateNea)
+
+  .delete(deleteNea);
 
 module.exports = router;

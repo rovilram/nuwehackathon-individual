@@ -1,17 +1,34 @@
 const express = require('express');
 
 const router = express.Router();
-/* const {
-  getQuestion,
-  postQuestion,
-  putQuestion,
-  delQuestion,
-  getAllQuestions,
-} = require('../controllers/questionController'); */
+const {
+  addUser,
+  addUserList,
+  getUser,
+  getUsers,
+  updateUser,
+  deleteUser,
+} = require('../controllers/userController');
 
 router
   .route('/')
-  .post(() => {})
-  .get(() => {});
+
+  .post(addUser)
+
+  .get(getUsers);
+
+router
+  .route('/:id')
+
+  .get(getUser)
+
+  .patch(updateUser)
+
+  .delete(deleteUser);
+
+router
+  .route('/list')
+
+  .post(addUserList);
 
 module.exports = router;

@@ -37,11 +37,13 @@ password.
 
 #### USER
 
+**idUser** String, unique, required
 **userName** String, unique, required
 **password** String, required
 
 #### NEA
 
+**idNea** String, unique, required
 **fullName**: String, unique, true
 **a** Number, required
 **b** Number, required
@@ -49,3 +51,14 @@ password.
 **om** Number, required
 **w** Number, required
 **ma** Number, required
+
+### ENDPOINTS
+
+#### USER
+
+**/user/** _POST_ CREA nuevo usuario. Recibe objeto _userName_ y _password_ **o** array de objetos de ese tipo.
+**/user/** _GET_ DEVUELVE todos los usuarios.
+
+**/user/:id/** _GET_ DEVUELVE el usuario pasado en _req.params_.
+**/user/:id/** _PATCH_ MODIFICA el usuario pasado en _req.params_. Puede recibir _userName_ y/o _password_
+**/user/:id/** _DELETE_ BORRA el usuario pasado en _req.params_.

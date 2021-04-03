@@ -1,6 +1,11 @@
 const mongoose = require('../database/mongoose');
 
 const neasSchema = new mongoose.Schema({
+  idNea: {
+    type: String,
+    unique: true,
+    required: true,
+  },
   fullName: {
     type: String,
     unique: true,
